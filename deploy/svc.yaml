@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    operated-prometheus: "true"
+    name: prometheus
+  name: prometheus
+#  namespace: default
+spec:
+  type: NodePort
+  ports:
+  - name: prometheus
+    port: 9090
+    protocol: TCP
+    nodePort: 9090
+    targetPort: 9090
+  selector:
+    app.kubernetes.io/name: prometheus

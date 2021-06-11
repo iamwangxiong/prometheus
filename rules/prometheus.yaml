@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: prometheus-rules
+  name: prometheus
+spec:
+  groups:
+    - name: prometheus
+      rules:
+      - alert: prometheus 配置加载错误
+        annotations:
+          description: Prometheus {{$labels.instance}} has failed to reload its configuration.
+          summary: Failed Prometheus configuration reload.
+        expr: |
+          # Without max_over_time, failed scrapes could create false negatives, see
+          # https://www.robustperception.io/alerting-on-gauges-in-prometheus-2-0 for details.
+          max_over_time(prometheus_config_last_reload_successful{}[5m]) == 0
+        for: 10m
+        labels:
+          severity: critical
+      - alert: Prometheus rules 错误
+        annotations:
+          description: Prometheus {{$labels.instance}} has failed to evaluate {{ printf "%.0f"
+            $value }} rules in the last 5m.
+          summary: Prometheus rules 错误
+        expr: |
+          increase(prometheus_rule_evaluation_failures_total{}[5m]) > 0
+        for: 15m
+        labels:
+          severity: critical
+      - alert: prometheus发送告警失败过多
+        annotations:
+          description: '{{ printf "%.1f" $value }}% minimum errors while sending alerts from
+            Prometheus {{$labels.instance}} to any Alertmanager.'
+          summary: Prometheus向任何Alertmanager发送警报时错误超过3%。
+        expr: |
+          min without (alertmanager) (
+            rate(prometheus_notifications_errors_total{alertmanager!~``}[5m])
+          /
+            rate(prometheus_notifications_sent_total{alertmanager!~``}[5m])
+          )
+          * 100
+          > 3
+        for: 15m
+        labels:
+          severity: critical

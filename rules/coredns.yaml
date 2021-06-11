@@ -1,0 +1,30 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: prometheus-rules
+  name: coredns
+spec:
+  groups:
+    - name: coredns
+      rules:
+      - alert: coredns Down
+        annotations:
+          message: CoreDNS has disappeared from Prometheus target discovery.
+          runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednsdown
+        expr: absent(up{job="coredns"} == 1)
+        for: 15m
+        labels:
+          severity: critical
+      - alert: CoreDNSErrorsHigh
+        annotations:
+          message: CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }} of
+            requests.
+          runbook_url: https://github.com/povilasv/coredns-mixin/tree/master/runbook.md#alert-name-corednserrorshigh
+        expr: |
+          sum(rate(coredns_dns_response_rcode_count_total{job="kube-dns",rcode="SERVFAIL"}[5m]))
+            /
+          sum(rate(coredns_dns_response_rcode_count_total{job="kube-dns"}[5m])) > 0.03
+        for: 10m
+        labels:
+          severity: criticali

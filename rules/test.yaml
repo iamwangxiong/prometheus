@@ -1,0 +1,26 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: prometheus-rules
+  name: test-rules
+spec:
+  groups:
+    - name: node-exporter
+      rules:
+      - alert: 主机状态
+        expr: up{container="node-exporter"} == 0
+        for: 1m
+        labels:
+          status: 非常严重
+        annotations:
+          summary: "{{$labels.instance}}:服务器宕机"
+          description: "{{$labels.instance}}:服务器延时超过5分钟"
+      - alert: CPU使用情况
+        expr: 100-(avg(irate(node_cpu_seconds_total{mode="idle"}[5m])) by(instance)* 100) > 60
+        for: 1m
+        labels:
+          status: 一般告警
+        annotations:
+          summary: "{{$labels.mountpoint}} CPU使用率过高！"
+          description: "{{$labels.mountpoint }} CPU使用大于60%(目前使用:{{$value}}%)"

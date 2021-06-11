@@ -1,0 +1,35 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    role: prometheus-rules
+  name: kube-state-metrics
+spec:
+  groups:
+    - name: kube-state-metrics
+      rules:
+      - alert: Pod 重启次数过多
+        annotations:
+          summary: Pod 重启次数过多.
+          description: Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container
+            }}) 重启 {{ printf "%.2f" $value }} 次 / 10 分钟.
+        expr: increase(kube_pod_container_status_restarts_total{}[10m]) > 5
+        for: 15m
+        labels:
+          severity: warning
+      - alert: Pod Not Ready
+        annotations:
+          description: Pod {{ $labels.namespace }}/{{ $labels.pod }} 已经超过15分钟 not ready
+          summary: Pod has been in a non-ready state for more than 15 minutes.
+        expr: |
+          sum by (namespace, pod) (
+            max by(namespace, pod) (
+              kube_pod_status_phase{phase=~"Pending|Unknown"}
+            ) * on(namespace, pod) group_left(owner_kind) topk by(namespace, pod) (
+              1, max by(namespace, pod, owner_kind) (kube_pod_owner{owner_kind!="Job"})
+            )
+          ) > 0
+        for: 15m
+        labels:
+          severity: warning
+

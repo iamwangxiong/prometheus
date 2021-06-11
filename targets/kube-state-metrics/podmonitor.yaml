@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: kube-state-metrics
+spec:
+  podMetricsEndpoints:
+  - interval: 15s
+    path: /metrics
+    port: http-metrics
+    honorLabels: true
+  namespaceSelector:
+    matchNames:
+    - prj-install
+  selector:
+    matchLabels:
+      k8s-app: kube-state-metrics
