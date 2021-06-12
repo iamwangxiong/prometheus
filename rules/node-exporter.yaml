@@ -24,7 +24,7 @@ spec:
         annotations:
           summary: "{{$labels.mountpoint}} CPU使用率过高！"
           description: "{{$labels.mountpoint }} CPU使用大于60%(目前使用:{{$value}}%)"
-      - alert: 内存使用
+      - alert: 内存使用情况
         expr: 1 - (node_memory_MemAvailable_bytes{container="node-exporter"} / node_memory_MemTotal_bytes{})
         for: 1m
         labels:
@@ -40,15 +40,6 @@ spec:
         annotations:
           summary: "{{$labels.mountpoint}} 流入磁盘IO使用率过高！"
           description: "{{$labels.mountpoint }} 流入磁盘IO大于60%(目前使用:{{$value}})"
-      - alert: 网络
-        expr: ((sum(rate (node_network_receive_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*'}[5m])) by (instance)) / 100) > 102400
-        for: 1m
-        labels:
-          status: 严重告警
-        annotations:
-          summary: "{{$labels.mountpoint}} 流入网络带宽过高！"
-          description: "{{$labels.mountpoint }}流入网络带宽持续2分钟高于100M. RX带宽使用率{{$value}}"
-
       - alert: 网络
         expr: ((sum(rate (node_network_transmit_bytes_total{device!~'tap.*|veth.*|br.*|docker.*|virbr*|lo*'}[5m])) by (instance)) / 100) > 102400
         for: 1m
