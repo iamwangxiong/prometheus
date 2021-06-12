@@ -25,7 +25,7 @@ spec:
           summary: "{{$labels.mountpoint}} CPU使用率过高！"
           description: "{{$labels.mountpoint }} CPU使用大于60%(目前使用:{{$value}}%)"
       - alert: 内存使用
-        expr: 100 -(node_memory_MemTotal_bytes -node_memory_MemFree_bytes+node_memory_Buffers_bytes+node_memory_Cached_bytes ) / node_memory_MemTotal_bytes * 100> 80
+        expr: 1 - (node_memory_MemAvailable_bytes{} / node_memory_MemTotal_bytes{})  )
         for: 1m
         labels:
           status: 严重告警

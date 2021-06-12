@@ -2,9 +2,7 @@ package main
 
 import (
 	"net/http"
-	"time"
 
-	log "github.com/gogap/logrus"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -16,15 +14,13 @@ type ClusterManager struct {
 	// ... many more fields
 }
 
-var times int
-
 // Simulate prepare the data
 func (c *ClusterManager) ReallyExpensiveAssessmentOfTheSystemState() (
 	oomCountByHost map[string]int, ramUsageByHost map[string]float64,
 ) {
 	// Just example fake data.
 	oomCountByHost = map[string]int{
-		"foo.example.org": times,
+		"foo.example.org": 42,
 		"bar.example.org": 2001,
 	}
 	ramUsageByHost = map[string]float64{
@@ -94,30 +90,7 @@ func main() {
 	reg := prometheus.NewPedanticRegistry()
 	reg.MustRegister(workerDB)
 	reg.MustRegister(workerCA)
-	go pingurl(workerDB)
 
 	http.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-	http.ListenAndServe(":8080", nil)
-
-}
-
-func pingurl(workerDB *ClusterManager) {
-	go func() {
-		for {
-			log.Info(workerDB.OOMCountDesc.String())
-			time.Sleep(2 * time.Second)
-		}
-	}()
-	for {
-		/*	cmd := exec.Command("/bin/sh", "-c", "ping www.baidu.com -c 1")
-			if _, err := cmd.Output(); err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			} else {
-				log.Info("Succeed to exec cmd ping")
-				times++
-			}*/
-		times++
-		time.Sleep(1 * time.Second)
-	}
+	http.ListenAndServe(":8888", nil)
 }
