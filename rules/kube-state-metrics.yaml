@@ -12,8 +12,8 @@ spec:
         annotations:
           summary: Pod 重启次数过多.
           description: Pod {{ $labels.namespace }}/{{ $labels.pod }} ({{ $labels.container
-            }}) 重启 {{ printf "%.2f" $value }} 次 / 10 分钟.
-        expr: increase(kube_pod_container_status_restarts_total{}[10m]) > 5
+            }}) 重启 {{ printf "%.2f" $value }} 次 / 2 分钟.
+        expr: rate(kube_pod_container_status_restarts_total{container!=""}[5m]) * 60 * 5 > 0
         for: 15m
         labels:
           severity: warning
