@@ -32,4 +32,3 @@ spec:
         for: 15m
         labels:
           severity: warning
-
