@@ -19,7 +19,7 @@ spec:
         effect: NoSchedule
       containers:
       - name: cadvisor
-        image: google/cadvisor:v0.33.0
+        image: uhub.service.ucloud.cn/leesin/cadvisior:v0.37.5
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: rootfs
@@ -45,6 +45,8 @@ spec:
         args:
           - --housekeeping_interval=10s
           - --port=4194
+          - --privileged
+          - --device=/dev/vdb
       terminationGracePeriodSeconds: 30
       volumes:
       - name: rootfs

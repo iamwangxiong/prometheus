@@ -4,7 +4,7 @@ metadata:
   name: kube-state-metrics
 spec:
   podMetricsEndpoints:
-  - interval: 15s
+  - interval: 30s
     path: /metrics
     port: http-metrics
     honorLabels: true

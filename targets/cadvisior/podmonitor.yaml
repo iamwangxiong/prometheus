@@ -4,7 +4,7 @@ metadata:
   name: cadvisor
 spec:
   podMetricsEndpoints:
-  - interval: 15s
+  - interval: 30s
     path: /metrics
     port: http
     honorLabels: true
