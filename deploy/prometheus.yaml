@@ -3,6 +3,9 @@ kind: Prometheus
 metadata:
   name: prometheus
 spec:
+  additionalScrapeConfigs:
+    name: additional-scrape-configs
+    key: additional.yaml
   ruleSelector:
     matchLabels:
       role: prometheus-rules
