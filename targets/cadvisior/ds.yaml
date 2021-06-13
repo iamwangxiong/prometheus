@@ -13,13 +13,17 @@ spec:
       labels:
         name: cadvisor
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
       hostNetwork: true
       tolerations:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       containers:
       - name: cadvisor
-        image: uhub.service.ucloud.cn/leesin/cadvisior:v0.37.5
+        image: google/cadvisor:v0.33.0
         imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: rootfs
@@ -33,6 +37,9 @@ spec:
         - name: docker
           mountPath: /var/lib/docker
           readOnly: true
+        - name: kmsg
+          mountPath: /dev/kmsg
+          readOnly: true
         ports:
           - name: http
             containerPort: 4194
@@ -45,8 +52,7 @@ spec:
         args:
           - --housekeeping_interval=10s
           - --port=4194
-#          - --privileged
-#          - --device=/dev/vdb
+          - --device=/dev/kmsg
       terminationGracePeriodSeconds: 30
       volumes:
       - name: rootfs
@@ -61,3 +67,6 @@ spec:
       - name: docker
         hostPath:
           path: /data/docker
+      - name: kmsg
+        hostPath:
+          path: /dev/kmsg

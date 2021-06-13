@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: grafna
+  name: grafna
+spec:
+  type: NodePort
+  ports:
+  - name: grafna
+    port: 3000
+    targetPort: 3000
+    nodePort: 3000
+  selector:
+    app: grafana
