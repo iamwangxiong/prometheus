@@ -7,6 +7,7 @@ spec:
   - interval: 15s
     path: /metrics
     port: http
+    honorLabels: true
   namespaceSelector:
     matchNames:
     - prj-install
